@@ -28,20 +28,16 @@ void getProcess(char *processId) {
     strcpy(rss,"0");
 
     file = fopen(filename,"r");
-
-    while(true){
-        char line[256];
-        if(1 != fscanf(file,sizeof line,line)){
-            break;
-        }
+    char line[256];
+    while(fgets(line, sizeof(line), file) != NULL){    
         if(strcmp("Name:",line) == 0) {
             fscanf(file, "%255s", processId);
         } else if(strcmp("VmRSS:", line) == 0) {
-            fscanf(file, "%255s", rss);
+                fscanf(file, "%255s", rss);
         } else if(strcmp(NAME, line) == 0) {
-            fscanf(file, "%255s", uid);
-            fscanf(file, "%255s", uid);
-            int tmp_uid = atoi(uid); 
+                fscanf(file, "%255s", uid);
+                fscanf(file, "%255s", uid);
+                int tmp_uid = atoi(uid); 
         }
         printFirstLine(pid, rss, uid);
     }
