@@ -1,2 +1,3 @@
-sudo rm -rf raw.out
+sudo rm -rf *.out
 sudo rm -rf ps
+sudo rm -rf delta.txt
