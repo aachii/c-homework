@@ -9,43 +9,41 @@
 
 
 #define RSS "VmRSS:"
-#define PID "PID:"
+#define PID "Pid:"
 #define NAME "Name:"
 
 void printFirstLine(char *pid, char *rss, char *uid) {
     printf("%s %s %s", pid,rss,uid);
 }
-void getProcess(char *name) {
-    printf("%s",name);
+void getProcess(char *processId) {
     char pid[256];
     char rss[256];
     char uid[256];
     
     FILE *file;
-    char filename[sizeof("/proc") + sizeof(name) + sizeof("/status")];
-    
-    strcpy(filename, "/proc");
-    strcat(filename, name);
-    strcpy(filename, "/status");
-    strcpy(rss,"0"); // set rss, if its not found in status file
+    char filename[sizeof("/proc/") + sizeof(processId) + sizeof("/status")];
+    strcpy(filename, "/proc/");
+    strcat(filename, processId);
+    strcat(filename, "/status");
+    strcpy(rss,"0");
+
     file = fopen(filename,"r");
-    for(;;){
+
+    while(true){
         char line[256];
-        if(1 != fscanf(file,"%255s",line)){
+        if(1 != fscanf(file,sizeof line,line)){
             break;
         }
-        if(strcmp(PID,line) == 0) {
-            fscanf(file, "%255s", pid);
-        } else if(strcmp(RSS, line) == 0) {
+        if(strcmp("Name:",line) == 0) {
+            fscanf(file, "%255s", processId);
+        } else if(strcmp("VmRSS:", line) == 0) {
             fscanf(file, "%255s", rss);
         } else if(strcmp(NAME, line) == 0) {
             fscanf(file, "%255s", uid);
             fscanf(file, "%255s", uid);
-            int tmp_uid = atoi(uid);
-            if(tmp_uid == getuid()){
-                printFirstLine(pid, rss, uid);
-            }
+            int tmp_uid = atoi(uid); 
         }
+        printFirstLine(pid, rss, uid);
     }
 }
 
@@ -61,11 +59,9 @@ int getAllDirectory() {
   
     while((de = readdir(dr)) != NULL){
         if(procs){
-            printf("%s",de -> d_name);
             getProcess(de -> d_name);
         }else{
             if(strcmp(de ->d_name,"1") == 0) {
-                printf("%s",de -> d_name);
                 procs = 1;
                 getProcess(de -> d_name);
             }
